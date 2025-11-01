@@ -5,7 +5,6 @@ namespace App\Services\Trip;
 use App\Attributes\TripStrategy;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
-use function dump;
 
 class TripStrategyDiscovery
 {
@@ -26,24 +25,20 @@ class TripStrategyDiscovery
             try {
                 $reflection = new ReflectionClass($className);
 
-                // ✅ تحقق إنه مش interface ومش abstract
                 if ($reflection->isInterface() || $reflection->isAbstract()) {
                     continue;
                 }
 
-                // ✅ تحقق إنه بينفذ الـ TripCostStrategy interface
                 if (!$reflection->implementsInterface(TripCostStrategy::class)) {
                     continue;
                 }
 
-                // جيب الـ attributes
                 $attributes = $reflection->getAttributes(TripStrategy::class);
 
                 if (empty($attributes)) {
                     continue;
                 }
 
-                // ✅ دلوقتي آمن نعمل newInstance
                 /** @var TripStrategy $attribute */
                 $attribute = $attributes[0]->newInstance();
                 $this->strategies[$attribute->type] = $className;
@@ -58,7 +53,6 @@ class TripStrategyDiscovery
     public function getStrategies(): array
     {
         if (empty($this->strategies)) {
-            // register default strategies if none discovered
             $this->discover(__DIR__);
         }
         return $this->strategies;
@@ -68,7 +62,6 @@ class TripStrategyDiscovery
     {
         $content = file_get_contents($file);
 
-        // استخرج الـ namespace والـ class name
         $namespace = '';
         $className = '';
 
