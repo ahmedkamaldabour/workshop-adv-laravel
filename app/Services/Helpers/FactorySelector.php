@@ -122,4 +122,16 @@ abstract class FactorySelector
         $reg = static::registry();
         return array_keys($reg);
     }
+
+    /**
+     * Return all available types (alias for keys method).
+     *
+     * @return array<string>
+     */
+    public static function getAvailableTypes(): array
+    {
+        // Ensure defaults are booted
+        static::bootDefaults();
+        return static::keys();
+    }
 }
