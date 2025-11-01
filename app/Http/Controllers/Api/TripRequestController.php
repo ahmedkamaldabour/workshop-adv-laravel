@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\TripCostRequest;
 use App\Services\Trip\TripCostCalculator;
 use App\Services\Trip\TripStrategyDiscovery;
-use Illuminate\Http\Request;
-use function collect;
+use Illuminate\Http\JsonResponse;
 
 class TripRequestController
 {
-
     public function __construct(
         public TripStrategyDiscovery $resolver
     ) {}
 
-
-    public function store(Request $request)
+    /**
+     * Calculate trip cost based on type, distance, and duration.
+     *
+     * @param TripCostRequest $request
+     * @return JsonResponse
+     */
+    public function store(TripCostRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'type' => 'required|string|in:international,intercity,local',
-            'distance_km' => 'required|numeric|min:0',
-            'duration_hours' => 'required|numeric|min:0'
-        ]);
+        // Validation is automatically handled by TripCostRequest
+        $data = $request->validated();
 
         $strategies = $this->resolver->getStrategies();
         $strategyClass = $strategies[$data['type']] ?? null;
